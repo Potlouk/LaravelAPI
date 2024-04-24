@@ -17,7 +17,7 @@ class Location extends Model
         'address',
         'city',
         'zip_code',
-        'cordinates',
+        'coordinates',
     ];
 
     public static $patchable = [
@@ -27,7 +27,7 @@ class Location extends Model
     ];
 
     protected $casts = [
-        'cordinates' => 'array',
+        'coordinates' => 'array',
     ];
 
     public static function findByAdress($data) {

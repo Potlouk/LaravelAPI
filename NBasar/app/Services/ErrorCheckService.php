@@ -50,5 +50,10 @@ class ErrorCheckService {
         if (in_array($data, $array))
             throw new self::$caller(GetErrorAction::AlreadyReported($this->errorOriginName,$eVarName));
     }
+
+    public function checkIfAlreadyExisting(Model $class,$value, $costumeKey) {
+        if ($class::where([$costumeKey => $value])->exists())
+            throw new self::$caller(GetErrorAction::doesExist($this->errorOriginName,$costumeKey,$value));
+    }
 }
 ?>

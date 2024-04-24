@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('estates', function (Blueprint $table) {
             $table->id();
-            $table->string('title', 255);
             $table->integer('price');
             $table->integer('floor');
             $table->integer('reported_count')->default(0);
@@ -25,7 +24,12 @@ return new class extends Migration
             $table->foreignId('sub_type')->constrained('estate_sub_types');
             $table->foreignId('building_material')->constrained('estate_building_material_types');
             $table->foreignId('condition')->constrained('estate_conditions_types');
+            $table->foreignId('room_type')->constrained('estate_room_types')->nullable();
             $table->foreignId('user_id')->constrained('users');
+            $table->integer('area');
+            $table->boolean('transaction_type');
+            $table->boolean('furniture')->nullable();
+            $table->text('images')->nullable();
             $table->text('info')->nullable();
         });
     }

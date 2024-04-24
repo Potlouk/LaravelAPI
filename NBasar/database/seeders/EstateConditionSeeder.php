@@ -14,16 +14,16 @@ class EstateConditionSeeder extends Seeder
     public function run(): void
     {
         $conditions = [
-            ['type' => 'Velmi dobrý'],
-            ['type' => 'Dobrý'],
-            ['type' => 'Špatný'],
-            ['type' => 'Ve výstavbě'],
-            ['type' => 'Developerské projekty'],
-            ['type' => 'Novostavba'],
-            ['type' => 'K demolici'],
-            ['type' => 'Před rekonstrukcí'],
-            ['type' => 'Po rekonstrukci'],
-            ['type' => 'V rekonstrukci'],
+            ['type' => 'velmi dobrý'],
+            ['type' => 'dobrý'],
+            ['type' => 'špatný'],
+            ['type' => 've výstavbě'],
+            ['type' => 'developerské projekty'],
+            ['type' => 'novostavba'],
+            ['type' => 'k demolici'],
+            ['type' => 'před rekonstrukcí'],
+            ['type' => 'po rekonstrukci'],
+            ['type' => 'v rekonstrukci'],
         ];
 
         DB::table('estate_conditions_types')->insert($conditions);

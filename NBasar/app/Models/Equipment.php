@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Equipment extends Model
 {
     use HasFactory;
-    protected $table = 'estate_has_equipment';
+    protected $table = 'estate_additional_equipment';
     protected $primaryKey = 'id';
     public $timestamps = false;
 
@@ -21,5 +21,12 @@ class Equipment extends Model
         'estate_id',
         'equipment_id',
     ];
+
+    public function estates()
+    {
+        return $this->belongsToMany(Estate::class, 'estate_has_equipment', 'equipment_id', 'estate_id');
+    }
+
+
 
 }

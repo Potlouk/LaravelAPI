@@ -14,9 +14,9 @@ class BuildingMaterialTypeSeeder extends Seeder
     public function run(): void
     {
         $types = [
-            ['type' => 'Cihla'],
-            ['type' => 'Panel'],
-            ['type' => 'Ostatní'],
+            ['type' => 'cihla'],
+            ['type' => 'panel'],
+            ['type' => 'ostatní'],
         ];
 
         DB::table('estate_building_material_types')->insert($types);

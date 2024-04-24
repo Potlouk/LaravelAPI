@@ -14,7 +14,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
       //  $middleware->append('UserMiddleware', 'App\Http\Middleware\UserMiddleware');
        // $middleware->append('EstateMiddleware', 'App\Http\Middleware\EstateMiddleware');
-        
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (App\Exceptions\AppException $exception) {

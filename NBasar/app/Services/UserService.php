@@ -6,7 +6,7 @@ use App\Mail\ContactSellerMail;
 use App\Mail\Registration;
 use App\Mail\Reported;
 use App\Models\Admin;
-use App\Models\RealEstate;
+use App\Models\Estate;
 use App\Models\User;
 use App\Services\ErrorCheckService;
 use Illuminate\Support\Arr;
@@ -15,28 +15,34 @@ use Illuminate\Support\Facades\Mail;
 
 Class UserService{
 
-    public function __construct(private $errorCheck) {
-        $this->errorCheck = new ErrorCheckService(ExceptionTypes::UserException);
+    public function __construct(private ErrorCheckService $errorCheck) {
     }
 
-    public function getUser($id){
-        $user = User::findById($id);
-        return $user;
+    public function getUser(){
+      
+      return Auth::guard('sanctum')->user();
     }
 
     public function getUsers($limit){
-        $users = User::all()->paginate($limit);
+        $users = User::paginate($limit);
         return $users;
     }
 
-    public function patchUser($id, $data){
-        $user = User::findById($id);
+    public function patchUser($data){
+        $user = User::findById(Auth::guard('sanctum')->user()->id);
         $patchData = (object) Arr::only((array) $data,  User::$patchable);
         
+        if(isset($data->email))
+        if ($data->email != $user->email)
+        $this->errorCheck->checkIfAlreadyExisting(new User, $data->email,'email');
+
         foreach ($patchData as $key => $value)
             $user->$key = $value;
 
-        return $user;
+        if (isset($data->password))
+            $user->password = bcrypt($data->password);
+
+        $user->save();
     }
 
     public function deleteUser($id){
@@ -45,18 +51,20 @@ Class UserService{
     }
 
     public function createUser($data){
-        $user = new User($data);
-        Mail::to($user->email)->send(new Registration($user));
+        $this->errorCheck->checkIfAlreadyExisting(new User, $data->email,'email');
+
+        $user = new User((array)$data);
+        $user->password = bcrypt($data->password);
+       // Mail::to($user->email)->send(new Registration($user));
         $user->assignRole('User');
         $user->save();
-        return $user->createToken("accessToken");
+        return $user->createToken("accessToken")->plainTextToken;
     }
 
     public function login($data){
         $user = User::findByEmail($data->email);
         $this->errorCheck->checkIfMashMatching($data->password, $user->password, 'heslo');
-        
-        return $user->createToken("accessToken");
+        return $user->createToken("accessToken")->plainTextToken;
     }
 
     public function contactSeller($data){
@@ -64,7 +72,7 @@ Class UserService{
         if(in_array($data->seller_id, $user->contacted_sellers))
         return false;
 
-        Mail::to($data->seller_email)->send(new ContactSellerMail($user,RealEstate::findByUuid($data->uuid)));
+        //Mail::to($data->seller_email)->send(new ContactSellerMail($user,Estate::findByUuid($data->uuid)));
         $user->contacted_sellers[] = $data['seller_id'];
         $user->save();
         return true;
@@ -72,14 +80,17 @@ Class UserService{
 
     public function addToFavorites($data){
         $user = User::findById(Auth::guard('sanctum')->user()->id);
+        $temp = $user->watched_estates;
         
-        if (!in_array($data->id, $user->watched_estates)){
-            $user->watched_estates[] = $data->id;
+        if (!in_array($data->uuid, $user->watched_estates)){
+            $temp[] = $data->uuid;
+            $user->watched_estates = $temp;
             $user->save();
             return true;
         }
        
-        $user->watched_estates = array_diff($user->watched_estates, [$data->id]);
+        $temp = array_diff($user->watched_estates, [$data->uuid]);
+        $user->watched_estates =  $temp;
         $user->save();
         return false;
     }
@@ -87,16 +98,13 @@ Class UserService{
     public function reportEstate($data){
         $user = User::findById(Auth::guard('sanctum')->user()->id);
 
-        $this->errorCheck->checkIfAlreadyReported($user->reported, $data->uuid, 'Nemovitost');
+       // $this->errorCheck->checkIfAlreadyReported($user->reported, $data->uuid, 'Nemovitost');
 
-        $user->reported[] = $data->id;
-        $user->save();
-           
-        $estate = RealEstate::findByUuid($data->uuid);
+        $estate = Estate::findByUuid($data->uuid);
         $estate->reported += 1;
         $estate->save();
         
-        Mail::to(Admin::getAdmin()->email)->send(new Reported($user, $data));
+       // Mail::to(Admin::getAdmin()->email)->send(new Reported($user, $data));
     }
 }
 ?>

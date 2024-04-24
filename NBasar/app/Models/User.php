@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
     protected $table = 'users';
     protected $primaryKey = 'id';
     public $timestamps = false;
@@ -17,6 +18,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'surname',
         'password',
         'data',
         'contacted_sellers',
@@ -28,15 +30,10 @@ class User extends Authenticatable
         'password',
     ];
 
-    public $patchable = [
+    public static $patchable = [
         'name',
         'email',
         'surname',
-        'password',
-        'data',
-        'contacted_sellers',
-        'watched_estates',
-        'reported_estates',
     ];
 
     protected $casts = [

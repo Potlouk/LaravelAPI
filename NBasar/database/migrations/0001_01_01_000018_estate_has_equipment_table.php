@@ -9,14 +9,12 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('estate_locations', function (Blueprint $table) {
+        Schema::create('estate_has_equipment', function (Blueprint $table) {
             $table->id();
-            $table->string('address', 255)->nullable();
-            $table->string('city', 100)->nullable();    
-            $table->string('zip_code', 20)->nullable();
-            $table->text('coordinates');
+            $table->foreignId('estate_id')->constrained('estates')->onDelete('cascade');;
+            $table->foreignId('equipment_id')->constrained('estate_additional_equipment');
         });
     }
 
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('estate_locations');
+        Schema::dropIfExists('estate_has_equipment');
     }
 };

@@ -19,6 +19,8 @@ class UserRequest extends FormRequest
             'name' => 'string',
             'email' => 'string',
             'password' => 'string',
+            'surname' => 'string',
+            'uuid' => 'string',
             'data' => '',
             'seller_id' => 'integer',
             'seller_email' => 'string',

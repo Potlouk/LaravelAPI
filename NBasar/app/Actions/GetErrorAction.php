@@ -10,6 +10,8 @@ public static function doesNotExist     ($erOrigin, $varName){ return self::getC
 public static function notMatching      ($erOrigin, $varName){ return self::getCodes('001D', $erOrigin, $varName);}
 public static function AlreadyReported  ($erOrigin, $varName){ return self::getCodes('001E', $erOrigin, $varName);}
 public static function NotMatchingHash  ($erOrigin, $varName){ return self::getCodes('001F', $erOrigin, $varName);}
+public static function doesExist        ($erOrigin, $varName){ return self::getCodes('001G', $erOrigin, $varName);}
+
 
 
 private static function getCodes ($code, $eOrginName = null, $eVarName = null){
@@ -38,7 +40,7 @@ private static $erroCodes = [
         "code" => 404
     ],
     "001C" => [
-        "error" => "001D",
+        "error" => "001C",
         "message" => "neexistuje.",
         "code" => 400
     ],
@@ -56,6 +58,12 @@ private static $erroCodes = [
         "error" => "001F",
         "message" => "se neschoduje.",
         "code" => 400]
+,
+    "001G" => [
+        "error" => "001G",
+        "message" => "již existuje.",
+        "code" => 400
+    ],
 
 ];
 

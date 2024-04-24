@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             BuildingConsuptionType::class,
             EstateAdditionalEquipment::class,
             EstateTypeSeeder::class,
+            EstateRoomTypeSeeder::class,
         ]);
     }
 }

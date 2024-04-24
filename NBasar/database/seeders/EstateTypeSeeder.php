@@ -14,12 +14,12 @@ class EstateTypeSeeder extends Seeder
     public function run(): void
     {
         $types = [
-            ['type' => 'Byty'],
-            ['type' => 'Domy'],
-            ['type' => 'Projekty'],
-            ['type' => 'Pozemeky'],
-            ['type' => 'Komercni'],
-            ['type' => 'Ostatni'],
+            ['type' => 'byty'],
+            ['type' => 'domy'],
+            ['type' => 'projekty'],
+            ['type' => 'pozemeky'],
+            ['type' => 'komercni'],
+            ['type' => 'ostatni'],
         ];
 
         DB::table('estate_types')->insert($types);

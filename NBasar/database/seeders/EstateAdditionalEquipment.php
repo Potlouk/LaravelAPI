@@ -14,22 +14,22 @@ class EstateAdditionalEquipment extends Seeder
     public function run(): void
     {
         $names = [
-            ['name' => 'Balkón'],
-            ['name' => 'Terasa'],
-            ['name' => 'Lodžie'],
-            ['name' => 'Sklep'],
-            ['name' => 'Zahrada'],
-            ['name' => 'Parkování'],
-            ['name' => 'Garáž'],
-            ['name' => 'Výtah'],
-            ['name' => 'Bezbariérový'],
-            ['name' => 'Nízkoenergetický'],
-            ['name' => 'Dřevostavba'],
-            ['name' => 'Přízemní'],
-            ['name' => 'Patrový'],
-            ['name' => 'Samostatný'],
-            ['name' => 'V bloku/řadový'],
-            ['name' => 'Bazén'],
+            ['name' => 'balkón'],
+            ['name' => 'terasa'],
+            ['name' => 'lodžie'],
+            ['name' => 'sklep'],
+            ['name' => 'zahrada'],
+            ['name' => 'parkování'],
+            ['name' => 'garáž'],
+            ['name' => 'výtah'],
+            ['name' => 'bezbariérový'],
+            ['name' => 'nízkoenergetický'],
+            ['name' => 'dřevostavba'],
+            ['name' => 'přízemní'],
+            ['name' => 'patrový'],
+            ['name' => 'samostatný'],
+            ['name' => 'v bloku/řadový'],
+            ['name' => 'bazén'],
         ];
 
         DB::table('estate_additional_equipment')->insert($names);

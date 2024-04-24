@@ -14,9 +14,9 @@ class OwnershipTypeSeeder extends Seeder
     public function run()
     {
         $types = [
-            ['type' => 'Osobní'],
-            ['type' => 'Družstevní'],
-            ['type' => 'Státní/obecní'],
+            ['type' => 'osobní'],
+            ['type' => 'družstevní'],
+            ['type' => 'státní/obecní'],
         ];
 
         DB::table('estate_ownership_types')->insert($types);
