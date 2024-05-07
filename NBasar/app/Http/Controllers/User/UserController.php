@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
 use App\Services\EstateService;
 use App\Services\UserService;
-use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -14,11 +13,11 @@ class UserController extends Controller
     }
 
     public function getUser() {
-        return $this->response(Auth::guard('sanctum')->user(), 200);
+        return $this->response($this->userService->getUser(), 200);
     }
 
-    public function delete($id) {
-        $this->userService->deleteUser($id);
+    public function deleteUser($id) {
+        $this->userService->delete($id);
         return $this->respondSuccess('Smazáno', 200);
     }
 
@@ -30,12 +29,14 @@ class UserController extends Controller
 
     public function createUser(UserRequest $request) {
         $req = (object) $request->validated();
-        $token = $this->userService->createUser($req);
+        $token = $this->userService->create($req);
         return $this->response($token, 201);
     }
 
-    public function all($limit){
-        return $this->respondWithPages($this->userService->getUsers($limit));
+    public function all(UserRequest $request){
+        return $this->respondWithPages(
+            $this->userService->getUsers($request)
+        );
     }
 
     public function login(UserRequest $request){
@@ -44,19 +45,16 @@ class UserController extends Controller
         return $this->response($user);
     }
 
-
-    public function getFavorites($id){
-        return $this->response($this->estateService->getFavorites($id));
-    }
-    public function getOwned($id){
-        return $this->response($this->estateService->getOwned($id));
+    public function getFavorites($id, UserRequest $request){
+        return $this->respondWithPages(
+            $this->estateService->getFavorites($id,$request)
+        );
     }
 
-    public function contactSeller(UserRequest $request){
-       $req = (object) $request->validated();
-       $contacted = $this->userService->contactSeller($req);
-       if ($contacted) return $this->respondSuccess('Prodejce kontaktován', 200);
-       else return $this->respondSuccess('Prodejce byl již kontaktován', 200);
+    public function getOwned($id, UserRequest $request){
+        return $this->respondWithPages(
+            $this->estateService->getPaginated('user_id',[$id],$request)
+        );
     }
 
     public function addToFavorite(UserRequest $request){

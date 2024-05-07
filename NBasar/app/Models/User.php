@@ -20,8 +20,6 @@ class User extends Authenticatable
         'email',
         'surname',
         'password',
-        'data',
-        'contacted_sellers',
         'watched_estates',
         'reported_estates'
     ];
@@ -37,7 +35,6 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'data' => 'json',
         'contacted_sellers' => 'array',
         'watched_estates' => 'array',
         'reported_estates' => 'array',
@@ -50,13 +47,12 @@ class User extends Authenticatable
     public static function findById($id) {
         return User::where('id', $id)->first();
     }
+
+    public static function findByIdWithRoles($id) {
+        return User::with('roles')->where('id', $id)->first();
+    }
+
     public static function findByEmail($email) {
         return User::where('email', $email)->first();
-    }
-    public static function GetFilteredUser($id){
-        return User::select('name','email','id')->where('id', $id)->first();
-    }
-    public static function getUsers($limit) {
-        return User::all()->paginate($limit);
     }
 }

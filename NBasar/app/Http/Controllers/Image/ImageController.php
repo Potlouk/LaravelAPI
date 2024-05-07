@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Image;
 
 use App\Http\Requests\ImageRequest;
 use App\Services\ImageService;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class ImageController extends Controller
 {
@@ -12,7 +12,6 @@ class ImageController extends Controller
     }
 
     public function saveImages(ImageRequest $request){
-      //  $req = (object) $request->validated();
         if ($request->hasFile('images'))
         $this->imageService->save($request->file('images'), $request->input('uuid'));
         return $this->respondSuccess('Uloženo', 201);

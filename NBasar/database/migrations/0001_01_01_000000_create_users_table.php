@@ -17,10 +17,8 @@ return new class extends Migration
             $table->string('surname');
             $table->string('email');
             $table->string('password');
-            $table->string('data')->nullable();
-            $table->text('contacted_sellers')->default('[]');
-            $table->text('watched_estates')->default('[]');
-            $table->text('reported_estates')->default('[]');
+            $table->json('watched_estates');
+            $table->json('reported_estates');
         });
 
     }

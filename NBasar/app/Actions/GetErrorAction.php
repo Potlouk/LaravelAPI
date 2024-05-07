@@ -3,7 +3,7 @@ namespace App\Actions;
 
 class GetErrorAction{
 
-public static function AccessDenied                    (){ return self::getCodes('000A'); }
+public static function AccessDenied                        (){ return self::getCodes('000A');}
 public static function isInvalid        ($erOrigin, $varName){ return self::getCodes('001A', $erOrigin, $varName);}
 public static function isEmpty          ($erOrigin, $varName){ return self::getCodes('001B', $erOrigin, $varName);}
 public static function doesNotExist     ($erOrigin, $varName){ return self::getCodes('001C', $erOrigin, $varName);}
@@ -11,8 +11,7 @@ public static function notMatching      ($erOrigin, $varName){ return self::getC
 public static function AlreadyReported  ($erOrigin, $varName){ return self::getCodes('001E', $erOrigin, $varName);}
 public static function NotMatchingHash  ($erOrigin, $varName){ return self::getCodes('001F', $erOrigin, $varName);}
 public static function doesExist        ($erOrigin, $varName){ return self::getCodes('001G', $erOrigin, $varName);}
-
-
+public static function isNegative       ($erOrigin, $varName){ return self::getCodes('001H', $erOrigin, $varName);}
 
 private static function getCodes ($code, $eOrginName = null, $eVarName = null){
     self::$erroCodes[$code]['message'] = self::setName(self::$erroCodes[$code]['message'],$eOrginName,$eVarName);
@@ -64,9 +63,10 @@ private static $erroCodes = [
         "message" => "již existuje.",
         "code" => 400
     ],
-
-];
-
-
+    "001H" => [
+        "error" => "001H",
+        "message" => "nesmí být záporné.",
+        "code" => 400
+    ]];
 }
 ?>

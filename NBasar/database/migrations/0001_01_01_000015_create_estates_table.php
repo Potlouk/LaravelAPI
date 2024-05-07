@@ -24,12 +24,12 @@ return new class extends Migration
             $table->foreignId('sub_type')->constrained('estate_sub_types');
             $table->foreignId('building_material')->constrained('estate_building_material_types');
             $table->foreignId('condition')->constrained('estate_conditions_types');
-            $table->foreignId('room_type')->constrained('estate_room_types')->nullable();
+            $table->foreignId('room_type')->nullable()->default(null)->constrained('estate_room_types');
             $table->foreignId('user_id')->constrained('users');
             $table->integer('area');
             $table->boolean('transaction_type');
             $table->boolean('furniture')->nullable();
-            $table->text('images')->nullable();
+            $table->json('images');
             $table->text('info')->nullable();
         });
     }

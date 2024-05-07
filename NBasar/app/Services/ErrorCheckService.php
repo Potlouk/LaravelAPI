@@ -9,8 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 
 class ErrorCheckService {
-    private $errorOriginName = 'unknown';
-    private static $caller;
+    protected $errorOriginName = 'unknown';
+    protected static $caller;
+
 
     public function __construct(ExceptionTypes $exceptionType) {
         $this->errorOriginName = $exceptionType->name. ":";
@@ -18,15 +19,22 @@ class ErrorCheckService {
     }
 
     public function checkIfExisting(Model $class,$value, $costumeKey = false) {
-        if($costumeKey != false)
+        if($costumeKey != false){
             if (!$class::where([$costumeKey => $value])->exists())
                 throw new self::$caller(GetErrorAction::doesNotExist($this->errorOriginName,$costumeKey,$value));
-
+        }else
         if (!$class::where([$class->getKeyName() => $value])->exists())
             throw new self::$caller(GetErrorAction::doesNotExist($this->errorOriginName,class_basename($class)));
    
     }
     
+    public function checkPaginateRequest($request){
+        $this->checkIfEmpty($request->input('limit'), 'Limit');
+        $this->checkIfEmpty($request->input('page'), 'Page');
+        $this->checkIfnegative($request->input('limit'), 'Limit');
+        $this->checkIfnegative($request->input('page'), 'Page');
+    }
+
     public function checkIfEmpty($data, $eVarName) {
         if (is_object($data)){
             if (empty(get_object_vars($data)))
@@ -34,6 +42,11 @@ class ErrorCheckService {
         }else
         if (empty($data) || $data == null)
             throw new self::$caller(GetErrorAction::isEmpty($this->errorOriginName,$eVarName));
+    }
+
+    public function checkIfNegative($data, $eVarName) {
+        if ($data < 0)
+            throw new self::$caller(GetErrorAction::isNegative($this->errorOriginName,$eVarName));
     }
 
     public function checkIfMatching($dataA,$dataB, $eVarName) {

@@ -14,6 +14,7 @@ class EstateSubTypeSeeder extends Seeder
     public function run(): void
     {
         $types = [
+            ['type' => 'pokoj'], 
             ['type' => '1+kk'],
             ['type' => '1+1'],
             ['type' => '2+kk'],

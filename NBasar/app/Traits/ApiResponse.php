@@ -22,10 +22,10 @@ trait ApiResponse
         ], $code);
     }
     
-    public static function respondWithPages($pages) {
+    public static function respondWithPages($data) {
         return response()->json([
-            'total' => $pages->total(),
-            'lastPage' => $pages->lastPage(),
-            'data' => $pages->items()], 200);
+            'total' => $data[1]->total(),
+            'lastPage' => $data[1]->lastPage(),
+            'data' => $data[0]], 200);
     }
 }

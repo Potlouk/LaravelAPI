@@ -13,7 +13,7 @@ class EstateController extends Controller
     }
 
     public function getEstate($uuid) {
-        $estate = $this->estateService->get('uuid',[$uuid])[0];
+        $estate = $this->estateService->get($uuid);
         return $this->response($estate, 200);
     }
     
@@ -22,11 +22,15 @@ class EstateController extends Controller
         return $this->response($estate, 200);
     }
 
-    public function deleteEstate($uuid, EstateRequest $request) {
-        if(str_contains($request->url(), 'admin'))
-        $this->estateService->delete($uuid, true);
-        else $this->estateService->delete($uuid);
+    public function deleteEstate($uuid) {
+        $this->estateService->delete($uuid);
         return $this->respondSuccess('Smazáno', 200);
+    }
+
+    public function searchEstate(EstateRequest $request) {
+        return $this->respondWithPages(
+            $this->estateService->search($request)
+        );
     }
 
     public function patchEstate($uuid,EstateRequest $request) {

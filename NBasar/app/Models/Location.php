@@ -15,25 +15,34 @@ class Location extends Model
 
     protected $fillable = [
         'address',
-        'city',
+        'short_name',
         'zip_code',
         'coordinates',
+        'county',
     ];
 
     public static $patchable = [
         'address',
-        'city',
+        'short_name',
         'zip_code',
+        'county',
+        'coordinates',
     ];
 
     protected $casts = [
-        'coordinates' => 'array',
+        'coordinates' => 'json',
     ];
+
+    public function lcounty()
+    {
+        return $this->belongsTo(County::class, 'county');
+    }
 
     public static function findByAdress($data) {
         return Location::where('address', $data->address)
-        ->where('city', $data->city)
+        ->where('short_name', $data->short_name)
         ->where('zip_code', $data->zip_code)
+        ->where('county', $data->county)
         ->first();  
     }
 

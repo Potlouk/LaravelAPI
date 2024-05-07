@@ -11,20 +11,20 @@ use App\Models\Location;
 use App\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 
 class EstateService {
+    
+
+    public function __construct(private ErrorCheckService $errorCheck) {
+    }
 
     public function search($request){
-        $query = Estate::with([
-            'elocation',
-            'photos',
-            'price',
-            'user'
-        ]);
+        $this->errorCheck->checkPaginateRequest($request);
+
+        $query = Estate::query();
     
         $fields = [
             'price',
@@ -43,7 +43,8 @@ class EstateService {
     
         foreach ($fields as $field) {
             if ($request->has($field) && !empty($request->input($field))) {
-                $query->where($field, $request->input($field));
+                $values = explode(',', $request->input($field));
+                $query->whereIn($field, $values);
             }
         }
     
@@ -54,79 +55,59 @@ class EstateService {
             });
         }
     
-        $estates = $query->get();
-    
-        return EstateResource::collection($estates);
+        if ($request->has('county') && !empty($request->input('county'))) {
+            $countyIds = explode(',', $request->input('county'));
+            $query->whereHas('elocation', function ($query) use ($countyIds) {
+                $query->whereIn('county', $countyIds);
+            });
+        }
+
+        $estates = $query->orderBy('id', 'desc')->paginate($request->input('limit'), ['*'], 'page', $request->input('page'));
+        
+        return [EstateResource::collection($estates),  $estates];
     }
 
-
-    public function get($key,$value){
-        $estates = Estate::with([
-            'elocation',
-            'ownershipType',
-            'energy',
-            'etype',
-            'subType',
-            'roomType',
-            'buildingMaterial',
-            'conditionType',
-            'equipment',
-            'user'
-        ])->whereIn($key, $value)->get();
-
-        return EstateResource::collection($estates);
+    public function get($uuid){
+        return new EstateResource(Estate::whereIn('uuid', [$uuid])->first());
     }
 
-    public function getFavorites($id){
-       return $this->get('uuid',(array) User::findById($id)->watched_estates);
+    public function getPaginated($key,$value,$request){
+        $this->errorCheck->checkPaginateRequest($request);
+        $estates = Estate::whereIn($key, $value)->paginate($request->input('limit'), ['*'], 'page', $request->input('page'));
+        return [EstateResource::collection($estates), $estates];
     }
 
-    public function getOwned($id){
-        return $this->get('user_id', [$id]);
+    public function getFavorites($id,$request){
+       return $this->getPaginated('uuid',(array) User::findById($id)->watched_estates, $request);
     }
 
-    public function getAll($limit){
-        $users = Estate::all()->paginate($limit);
-        return $users;
-    }
     public function patch($uuid, $data){
-        $parsedData = [];
-        foreach ($data as $item)
-        $parsedData[$item['name']] = $item['value'];
-
+        $parsedData = $this->parseData($data);
         $estate = Estate::findByUuid($uuid);
         $locationId = Location::findByAdress((object)$parsedData['location']);
-
-       if ($locationId)
-            $estate->location = $locationId->id;
-        else {
-            $location = new Location($parsedData['location']);
-            $location->save();
-            $estate->location = $location->id;
-        }
+        
+        $locationId ? $estate->location = $locationId->id : $estate->location = $this->createLocation($parsedData);
 
         $patchData = (object) Arr::only((array) $parsedData, Estate::$patchable);
 
         foreach ($patchData as $key => $value)
-            $estate->$key = $value;
-        
+        $estate->$key = $value;
+
         $estate->equipment()->detach();
         $estate->equipment()->attach($parsedData['additional_equipment']);
 
         $estate->save();
     }
 
-    public function delete($uuid, $byAdmin = false){
-
-
+    public function delete($uuid){
         $estate = Estate::findByUuid($uuid);
+        $user = User::findById(Auth::guard('sanctum')->user()->id);
+        
+        if ($estate->user_id != Auth::guard('sanctum')->user()->id && !$user->hasRole('Admin'))
+        return false; //add error throw
 
-        if ($estate->user_id != Auth::guard('sanctum')->user()->id && !$byAdmin)
-            return false; //add error throw
-
-        if ($byAdmin)
-        if (in_array('Admin', User::findById(Auth::guard('sanctum')->user()->id)->getRoleNames()))
-        Mail::to(User::findById($estate->user_id)->email)->send(new DeletedByAdmin($estate));
+       // if ($user->hasRole('Admin'))
+        //Mail::to(User::findById($estate->user_id)->email)->send(new DeletedByAdmin($estate));
 
         $estate->delete();
     }
@@ -134,20 +115,11 @@ class EstateService {
     public function create($data){
         $estate = new Estate();
         $user = User::findById(Auth::guard('sanctum')->user()->id);
-        $parsedData = [];
-
-        foreach ($data as $item)
-        $parsedData[$item['name']] = $item['value'];
+        $parsedData = $this->parseData($data);
         
         $estate->user_id = $user->id;
         $locationId = Location::findByAdress((object)$parsedData['location']);
-       if ($locationId)
-            $estate->location = $locationId->id;
-        else {
-            $location = new Location($parsedData['location']);
-            $location->save();
-            $estate->location = $location->id;
-        }
+        $locationId ? $estate->location = $locationId->id : $estate->location = $this->createLocation($parsedData);
 
         $patchData = (object) Arr::only((array) $parsedData, Estate::$patchable);
         foreach ($patchData as $key => $value)
@@ -156,6 +128,7 @@ class EstateService {
         $estate->info = json_encode($parsedData['info']);
         $estate->reported_count = 0;
         $estate->uuid = Str::uuid()->toString();
+        $estate->images = [];
         $estate->save();
         $estate->equipment()->attach($parsedData['additional_equipment']);
 
@@ -164,9 +137,24 @@ class EstateService {
 
     public function getwithIDs($uuid){
         $estate = Estate::findByUuid($uuid);
-        $estate->equipment = EquipmentList::where('estate_id', $estate->id)->get()->pluck('equipment_id');
+        $estate->additional_equipment = EquipmentList::where('estate_id', $estate->id)->get()->pluck('equipment_id');
         $estate->location = Location::findById($estate->location);
         return $estate;
+    }
+
+    private function createLocation($data){
+        $location = new Location($data['location']);
+        $location->save();
+        return $location->id;
+    }
+
+    private function parseData($data){
+        $parsedData = [];
+        foreach ($data as $item)
+        $parsedData[$item['name']] = $item['value'];
+        
+        $this->errorCheck->checkIfEmpty($parsedData,'Data');
+        return $parsedData;
     }
 }
 ?>

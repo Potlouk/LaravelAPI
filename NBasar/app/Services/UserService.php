@@ -2,7 +2,7 @@
 namespace App\Services;
 
 use App\Exceptions\ExceptionTypes;
-use App\Mail\ContactSellerMail;
+use App\Http\Resources\UserResource;
 use App\Mail\Registration;
 use App\Mail\Reported;
 use App\Models\Admin;
@@ -15,27 +15,32 @@ use Illuminate\Support\Facades\Mail;
 
 Class UserService{
 
-    public function __construct(private ErrorCheckService $errorCheck) {
+    function __construct(private ErrorCheckService $errorCheck) {
     }
 
     public function getUser(){
-      
-      return Auth::guard('sanctum')->user();
+        $user = User::findByIdWithRoles(Auth::guard('sanctum')->user()->id);
+        return new UserResource($user);
     }
 
-    public function getUsers($limit){
-        $users = User::paginate($limit);
-        return $users;
+    public function getUsers($request){
+        $this->errorCheck->checkPaginateRequest($request);
+        $users = User::paginate($request->input('limit'), ['*'], 'page', $request->input('page'));
+        return [UserResource::collection($users), $users];
     }
 
     public function patchUser($data){
-        $user = User::findById(Auth::guard('sanctum')->user()->id);
-        $patchData = (object) Arr::only((array) $data,  User::$patchable);
-        
-        if(isset($data->email))
-        if ($data->email != $user->email)
-        $this->errorCheck->checkIfAlreadyExisting(new User, $data->email,'email');
+        $userOrigin = User::findById(Auth::guard('sanctum')->user()->id);
+        $userId = $userOrigin->hasRole('Admin') ? $data->id : $userOrigin->id;
+        $this->errorCheck->checkIfEmpty($userId, 'id');
+        $user = User::findById($userId);
 
+        if (isset($data->email))
+        if ($data->email != $user->email && !$user->hasRole('Admin'))
+            $this->errorCheck->checkIfAlreadyExisting(new User, $data->email,'email');
+
+        $patchData = (object) Arr::only((array) $data, User::$patchable);
+        
         foreach ($patchData as $key => $value)
             $user->$key = $value;
 
@@ -45,16 +50,18 @@ Class UserService{
         $user->save();
     }
 
-    public function deleteUser($id){
+    public function delete($id){
         $user = User::findById($id);
         $user->delete();
     }
 
-    public function createUser($data){
+    public function create($data){
         $this->errorCheck->checkIfAlreadyExisting(new User, $data->email,'email');
 
         $user = new User((array)$data);
         $user->password = bcrypt($data->password);
+
+        $user->watched_estates = $user->reported_estates = [];
        // Mail::to($user->email)->send(new Registration($user));
         $user->assignRole('User');
         $user->save();
@@ -62,20 +69,11 @@ Class UserService{
     }
 
     public function login($data){
+        $this->errorCheck->checkIfEmpty($data->email, 'email');
+        $this->errorCheck->checkIfExisting(new User, $data->email, 'email');
         $user = User::findByEmail($data->email);
         $this->errorCheck->checkIfMashMatching($data->password, $user->password, 'heslo');
         return $user->createToken("accessToken")->plainTextToken;
-    }
-
-    public function contactSeller($data){
-        $user = User::findById(Auth::guard('sanctum')->user()->id);
-        if(in_array($data->seller_id, $user->contacted_sellers))
-        return false;
-
-        //Mail::to($data->seller_email)->send(new ContactSellerMail($user,Estate::findByUuid($data->uuid)));
-        $user->contacted_sellers[] = $data['seller_id'];
-        $user->save();
-        return true;
     }
 
     public function addToFavorites($data){
@@ -96,14 +94,9 @@ Class UserService{
     }
 
     public function reportEstate($data){
-        $user = User::findById(Auth::guard('sanctum')->user()->id);
-
-       // $this->errorCheck->checkIfAlreadyReported($user->reported, $data->uuid, 'Nemovitost');
-
         $estate = Estate::findByUuid($data->uuid);
         $estate->reported += 1;
         $estate->save();
-        
        // Mail::to(Admin::getAdmin()->email)->send(new Reported($user, $data));
     }
 }

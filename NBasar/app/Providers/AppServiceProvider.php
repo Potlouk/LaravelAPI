@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
             return new ErrorCheckService(ExceptionTypes::ImageException);
         });
 
-        $this->app->when(['App\Services\EsateService','App\middleware\Http\Middleware\EstateMiddleware'])
+        $this->app->when(['App\Services\EstateService','App\middleware\Http\Middleware\EstateMiddleware'])
         ->needs('App\Services\ErrorCheckService')
         ->give(function () {
             return new ErrorCheckService(ExceptionTypes::EstateException);

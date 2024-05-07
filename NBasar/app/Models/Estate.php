@@ -38,7 +38,6 @@ class Estate extends Model
 
     protected $casts = [
         'data' => 'json',
-        'info' => 'string',
         'images' => 'array',
     ];
 
@@ -114,7 +113,7 @@ class Estate extends Model
         return Estate::where('id', $id)->first();
     }
     public static function findByUuid($id) {
-        return Estate::where('Uuid', $id)->first();
+        return Estate::where('uuid', $id)->first();
     }
 
     public static function costumeCollection($filters){
