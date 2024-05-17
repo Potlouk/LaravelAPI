@@ -9,11 +9,11 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class Reported extends Mailable
+class UserCreate extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct()
+    public function __construct(public $data)
     {
         //
     }
@@ -21,14 +21,14 @@ class Reported extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Nemovitost byla nahlášena',
+            subject: 'Váš účet byl vytvořen',
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'ReportedEstate',
+            view: 'UserCreated',
         );
     }
 

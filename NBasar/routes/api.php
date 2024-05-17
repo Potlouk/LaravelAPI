@@ -25,6 +25,9 @@ Route::group(['namespace' => 'Image', 'middleware' => ['auth:sanctum','ImageMidd
 Route::group(['namespace'=> 'Estate'], function(){
     Route::get('/estates/search', [EstateController::class,'searchEstate']);
     Route::get('/estate/{uuid}', [EstateController::class,'getEstate']);
+    Route::get('/count', [EstateController::class,'getCount']);
+    Route::get('/estates/search/count', [EstateController::class,'getEstateCount']);
+    Route::get('/estates/reported', [EstateController::class,'getEstateReported']);
 });
 
 Route::group(['namespace' => 'Estate', 'middleware' => 'auth:sanctum'], function(){

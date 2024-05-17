@@ -9,26 +9,26 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ContactSellerMail extends Mailable
+class UserPatched extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct()
+ 
+    public function __construct(public $data)
     {
-        //
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Connection Notification',
+            subject: 'Váš účet byl upraven',
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'ContactSeller',
+            view: 'UserPatched',
         );
     }
 

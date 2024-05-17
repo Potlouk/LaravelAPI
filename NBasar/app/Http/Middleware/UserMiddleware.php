@@ -18,28 +18,13 @@ class UserMiddleware
     {
         $errorCheck = new ErrorCheckService(ExceptionTypes::UserException);
 
-        if ($request->isMethod('patch')) {
+        if ($request->isMethod('patch') || $request->isMethod('delete')) {
             if (!Auth::guard('sanctum')->check())
                 throw new AppException(GetErrorAction::AccessDenied());
             
-            $errorCheck->checkIfExisting(new User, $request->input('id'));
+            if (isset($request->id)) 
+                $errorCheck->checkIfExisting(new User, $request->id);
             
-            if (User::findById(Auth::guard('sanctum')->user()->id)->hasRole('Admin'))  
-                return $next($request);
-
-            $errorCheck->checkIfMatching($request->input('id'), Auth::guard('sanctum')->user()->id, 'id');
-        }
-
-        if ($request->isMethod('delete')) {
-            if (!Auth::guard('sanctum')->check())
-                throw new AppException(GetErrorAction::AccessDenied());
-            
-            $errorCheck->checkIfExisting(new User, $request->route('id'));
-            
-            if (User::findById(Auth::guard('sanctum')->user()->id)->hasRole('Admin'))  
-                return $next($request);
-
-            $errorCheck->checkIfMatching($request->id, Auth::guard('sanctum')->user()->id, 'id');
         }
 
         return $next($request);

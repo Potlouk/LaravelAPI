@@ -4,13 +4,16 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
+use App\Mail\Reported;
 use App\Services\EstateService;
 use App\Services\UserService;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
     public function __construct(private UserService $userService, private EstateService $estateService){
     }
+
 
     public function getUser() {
         return $this->response($this->userService->getUser(), 200);

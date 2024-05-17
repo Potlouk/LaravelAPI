@@ -9,11 +9,11 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class Registration extends Mailable
+class EstateReported extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct()
+    public function __construct(public $data)
     {
         //
     }
@@ -21,14 +21,14 @@ class Registration extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Successfully Registered',
+            subject: 'Nemovitost byla nahlášena',
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'Registration',
+            view: 'EstateReported',
         );
     }
 

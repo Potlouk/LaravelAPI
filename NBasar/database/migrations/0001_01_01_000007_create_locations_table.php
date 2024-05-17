@@ -10,9 +10,9 @@ return new class extends Migration
     {
         Schema::create('estate_locations', function (Blueprint $table) {
             $table->id();
-            $table->string('address', 255)->nullable();
+            $table->string('address', 100)->nullable();
             $table->string('short_name', 100)->nullable();    
-            $table->string('zip_code', 20)->nullable();
+            $table->string('zip_code', 6)->nullable();
             $table->foreignId('county')->constrained('locations_counties');
             $table->text('coordinates');
         });

@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('surname');
-            $table->string('email');
+            $table->string('name',26);
+            $table->string('surname',26);
+            $table->string('email',32);
             $table->string('password');
             $table->json('watched_estates');
             $table->json('reported_estates');

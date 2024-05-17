@@ -1,10 +1,11 @@
 <?php
 namespace App\Services;
 
-use App\Exceptions\ExceptionTypes;
 use App\Http\Resources\UserResource;
-use App\Mail\Registration;
-use App\Mail\Reported;
+use App\Mail\EstateReported;
+use App\Mail\UserCreate;
+use App\Mail\UserDelete;
+use App\Mail\UserPatched;
 use App\Models\Admin;
 use App\Models\Estate;
 use App\Models\User;
@@ -25,6 +26,7 @@ Class UserService{
 
     public function getUsers($request){
         $this->errorCheck->checkPaginateRequest($request);
+        $this->errorCheck->checkIfAdmin(User::findById(Auth::guard('sanctum')->user()->id));
         $users = User::paginate($request->input('limit'), ['*'], 'page', $request->input('page'));
         return [UserResource::collection($users), $users];
     }
@@ -48,11 +50,14 @@ Class UserService{
             $user->password = bcrypt($data->password);
 
         $user->save();
+        Mail::to($user->email)->send(new UserPatched($user));
     }
 
     public function delete($id){
         $user = User::findById($id);
+        $user->tokens()->delete();
         $user->delete();
+        Mail::to($user->email)->send(new UserDelete($user));
     }
 
     public function create($data){
@@ -62,9 +67,10 @@ Class UserService{
         $user->password = bcrypt($data->password);
 
         $user->watched_estates = $user->reported_estates = [];
-       // Mail::to($user->email)->send(new Registration($user));
         $user->assignRole('User');
         $user->save();
+
+        Mail::to($user->email)->send(new UserCreate($user));
         return $user->createToken("accessToken")->plainTextToken;
     }
 
@@ -95,9 +101,19 @@ Class UserService{
 
     public function reportEstate($data){
         $estate = Estate::findByUuid($data->uuid);
-        $estate->reported += 1;
+        $user = User::findById(Auth::guard('sanctum')->user()->id);
+        $temp = $user->reported_estates;
+
+        if (in_array($data->uuid, $user->reported_estates))
+        return false;
+
+        $estate->reported_count += 1;
         $estate->save();
-       // Mail::to(Admin::getAdmin()->email)->send(new Reported($user, $data));
+        $temp[] = $data->uuid;
+        $user->reported_estates = $temp;
+        $user->save();
+       // Mail::to(Admin::getAdmin()->email)->send(new EstateReported($data));
+        
     }
 }
 ?>

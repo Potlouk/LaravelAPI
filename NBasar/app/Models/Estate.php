@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Support\Facades\DB;
 
 class Estate extends Model
 {
@@ -27,7 +25,7 @@ class Estate extends Model
         'ownership_type',
         'energy_consumption',
         'type',
-        'location', //coordinates
+        'location',
         'condition',
         'area',
         'transaction_type',

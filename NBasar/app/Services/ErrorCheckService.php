@@ -27,7 +27,12 @@ class ErrorCheckService {
             throw new self::$caller(GetErrorAction::doesNotExist($this->errorOriginName,class_basename($class)));
    
     }
-    
+
+    public function checkifAdmin($user){
+        if (!$user->hasRole('Admin'))
+            throw new self::$caller(GetErrorAction::AccessDenied());
+    }
+
     public function checkPaginateRequest($request){
         $this->checkIfEmpty($request->input('limit'), 'Limit');
         $this->checkIfEmpty($request->input('page'), 'Page');

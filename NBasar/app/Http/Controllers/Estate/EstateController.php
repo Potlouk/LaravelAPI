@@ -12,6 +12,22 @@ class EstateController extends Controller
     public function __construct(private EstateService $estateService, private ImageService $imageService){
     }
 
+    public function getCount() {
+        return $this->response($this->estateService->getCount(), 200);
+    }
+
+    public function getEstateCount(EstateRequest $request) {
+        return $this->response(
+            $this->estateService->search($request, true)
+        );
+    }
+
+    public function getEstateReported(EstateRequest $request){
+        return $this->respondWithPages(
+            $this->estateService->getReported($request)
+        );
+    }
+
     public function getEstate($uuid) {
         $estate = $this->estateService->get($uuid);
         return $this->response($estate, 200);

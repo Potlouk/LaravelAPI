@@ -26,6 +26,9 @@ class ImageMiddleware
            $request->route('uuid') ? $request->route('uuid') : $request->input('uuid'),
         'Uuid');
 
+        if ($request->isMethod('delete'))
+            $errorCheck->checkIfEmpty($request->query('images'), 'Images');
+
         return $next($request);
     }
 }

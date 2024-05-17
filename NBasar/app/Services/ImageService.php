@@ -24,6 +24,6 @@ class ImageService{
         Storage::disk('public')->delete($images);
         $eImages = array_diff($eImages, $images);
         $estate->images = $eImages;
-        $estate->save();
+        $estate->save(); //smaz obrazky pri delte estatu 
     }
 }

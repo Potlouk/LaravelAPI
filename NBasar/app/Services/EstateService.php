@@ -4,6 +4,10 @@ namespace App\Services;
 use App\Http\Requests\EstateRequest;
 use App\Http\Resources\EstateResource;
 use App\Mail\DeletedByAdmin;
+use App\Mail\EstateCreate;
+use App\Mail\EstateCreated;
+use App\Mail\EstateDeleted;
+use App\Mail\EstatePatched;
 use App\Models\Equipment;
 use App\Models\EquipmentList;
 use App\Models\Estate;
@@ -21,7 +25,8 @@ class EstateService {
     public function __construct(private ErrorCheckService $errorCheck) {
     }
 
-    public function search($request){
+    public function search($request , $rows = false){
+        if(!$rows)
         $this->errorCheck->checkPaginateRequest($request);
 
         $query = Estate::query();
@@ -34,27 +39,40 @@ class EstateService {
             'ownership_type',
             'energy_consumption',
             'type',
+            'area',
             'condition',
             'room_type',
             'furniture',
-            'area',
             'transaction_type',
         ];
     
         foreach ($fields as $field) {
+     
             if ($request->has($field) && !empty($request->input($field))) {
-                $values = explode(',', $request->input($field));
-                $query->whereIn($field, $values);
+
+                if ($field == 'price' || $field == 'area' || $field == 'floor')  {
+                    $values = explode(',', $request->input($field));
+                    $query->whereBetween($field, $values);
+                    continue;
+                }
+
+                if (str_contains($request->input($field), ',')){
+                    $values = explode(',', $request->input($field));
+                    $query->whereIn($field, $values);
+                    continue;
+                }
+
+                $query->where($field,"=",$request->input($field));
             }
         }
-    
+        
         if ($request->has('equipment') && !empty($request->input('equipment'))) {
             $equipmentIds = $request->input('equipment');
             $query->whereHas('equipment', function ($query) use ($equipmentIds) {
-                $query->whereIn('equipment_id', $equipmentIds);
+                $query->where('equipment_id', $equipmentIds);
             });
         }
-    
+       
         if ($request->has('county') && !empty($request->input('county'))) {
             $countyIds = explode(',', $request->input('county'));
             $query->whereHas('elocation', function ($query) use ($countyIds) {
@@ -62,9 +80,25 @@ class EstateService {
             });
         }
 
+        if ($rows) return $query->count();
+        
         $estates = $query->orderBy('id', 'desc')->paginate($request->input('limit'), ['*'], 'page', $request->input('page'));
         
         return [EstateResource::collection($estates),  $estates];
+    }
+
+    public function getCount(){
+        return Estate::count();
+    }
+
+    public function getReported($request){
+        $this->errorCheck->checkPaginateRequest($request);
+        $estates = Estate::where('reported_count', '>', 0)
+            ->orderBy('reported_count','desc')
+            ->paginate($request->input('limit'), ['*'], 'page', $request->input('page'));
+
+       if ($estates->isEmpty()) return [null, $estates];
+       return [EstateResource::collection($estates), $estates];
     }
 
     public function get($uuid){
@@ -78,6 +112,7 @@ class EstateService {
     }
 
     public function getFavorites($id,$request){
+        $this->errorCheck->checkIfExisting(new User, $id);
        return $this->getPaginated('uuid',(array) User::findById($id)->watched_estates, $request);
     }
 
@@ -97,6 +132,7 @@ class EstateService {
         $estate->equipment()->attach($parsedData['additional_equipment']);
 
         $estate->save();
+        Mail::to(Auth::guard('sanctum')->user()->email)->send(new EstatePatched());
     }
 
     public function delete($uuid){
@@ -104,12 +140,10 @@ class EstateService {
         $user = User::findById(Auth::guard('sanctum')->user()->id);
         
         if ($estate->user_id != Auth::guard('sanctum')->user()->id && !$user->hasRole('Admin'))
-        return false; //add error throw
-
-       // if ($user->hasRole('Admin'))
-        //Mail::to(User::findById($estate->user_id)->email)->send(new DeletedByAdmin($estate));
+        return false; 
 
         $estate->delete();
+        Mail::to($user->email)->send(new EstateDeleted($estate));
     }
 
     public function create($data){
@@ -131,6 +165,8 @@ class EstateService {
         $estate->images = [];
         $estate->save();
         $estate->equipment()->attach($parsedData['additional_equipment']);
+
+        Mail::to($user->email)->send(new EstateCreated($estate));
 
         return $estate->uuid;
     }
