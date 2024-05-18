@@ -42,6 +42,8 @@ Route::group(['namespace'=> 'User'], function(){
     Route::post('/user',[UserController::class,'createUser']);
 });
 
-
+Route::fallback(function(){
+    return response()->json(['message' => 'Not Found'], 404);
+});
 
 ?>

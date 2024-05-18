@@ -6,7 +6,6 @@ use App\Mail\EstateReported;
 use App\Mail\UserCreate;
 use App\Mail\UserDelete;
 use App\Mail\UserPatched;
-use App\Models\Admin;
 use App\Models\Estate;
 use App\Models\User;
 use App\Services\ErrorCheckService;
@@ -112,8 +111,7 @@ Class UserService{
         $temp[] = $data->uuid;
         $user->reported_estates = $temp;
         $user->save();
-       // Mail::to(Admin::getAdmin()->email)->send(new EstateReported($data));
-        
+        Mail::to(User::role('Admin')->first()->email)->send(new EstateReported($data));
     }
 }
 ?>

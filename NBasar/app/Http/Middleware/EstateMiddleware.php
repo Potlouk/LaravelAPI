@@ -31,6 +31,18 @@ class EstateMiddleware
             $errorCheck->checkIfMatching(Estate::findByUuid($request->route('uuid'))->user_id, Auth::guard('sanctum')->user()->id,'uuid');    
         }
 
+        if ($request->isMethod('delete')) {
+            if (!Auth::guard('sanctum')->check())
+                throw new AppException(GetErrorAction::AccessDenied());
+            
+            $errorCheck->checkIfExisting(new Estate,$request->route('uuid'),'Uuid');
+            
+            if (User::findById(Auth::guard('sanctum')->user())->hasRole('Admin'))  
+                return $next($request);
+
+            $errorCheck->checkIfMatching(Estate::findByUuid($request->route('uuid'))->user_id, Auth::guard('sanctum')->user()->id,'uuid');    
+        }
+
         return $next($request);
     }
 }

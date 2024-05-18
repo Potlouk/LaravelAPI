@@ -1,14 +1,10 @@
 <?php
 namespace App\Services;
 
-use App\Http\Requests\EstateRequest;
 use App\Http\Resources\EstateResource;
-use App\Mail\DeletedByAdmin;
-use App\Mail\EstateCreate;
 use App\Mail\EstateCreated;
 use App\Mail\EstateDeleted;
 use App\Mail\EstatePatched;
-use App\Models\Equipment;
 use App\Models\EquipmentList;
 use App\Models\Estate;
 use App\Models\Location;
@@ -16,6 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 
@@ -138,11 +135,8 @@ class EstateService {
     public function delete($uuid){
         $estate = Estate::findByUuid($uuid);
         $user = User::findById(Auth::guard('sanctum')->user()->id);
-        
-        if ($estate->user_id != Auth::guard('sanctum')->user()->id && !$user->hasRole('Admin'))
-        return false; 
-
         $estate->delete();
+        Storage::disk('public')->delete($estate->uuid);
         Mail::to($user->email)->send(new EstateDeleted($estate));
     }
 
