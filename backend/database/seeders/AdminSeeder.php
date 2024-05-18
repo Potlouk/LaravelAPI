@@ -14,7 +14,6 @@ class AdminSeeder extends Seeder
             'surname' => 'Admin',
             'email' => env('ADMIN_EMAIL'),
             'password' => bcrypt(env('ADMIN_PASSWORD')),
-            'contacted_sellers' => [],
             'watched_estates' => [],
             'reported_estates' => [],
         ]);

@@ -14,7 +14,6 @@ class UserSeeder extends Seeder
             'surname' => 'Doe',
             'email' => 'test@test.test',
             'password' => bcrypt('root'),
-            'contacted_sellers' => [],
             'watched_estates' => [],
             'reported_estates' => [],
         ]);
