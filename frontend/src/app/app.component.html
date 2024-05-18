@@ -1,0 +1,13 @@
+@if (loaderActive) {
+<div
+  class="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-white bg-opacity-50 z-50"
+>
+  <div
+    class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-black"
+  ></div>
+</div>
+} @else {
+
+<app-header></app-header>
+<router-outlet></router-outlet>
+}
