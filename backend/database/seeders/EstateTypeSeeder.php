@@ -16,10 +16,9 @@ class EstateTypeSeeder extends Seeder
         $types = [
             ['type' => 'byty'],
             ['type' => 'domy'],
-            ['type' => 'projekty'],
-            ['type' => 'pozemeky'],
-            ['type' => 'komercni'],
-            ['type' => 'ostatni'],
+            ['type' => 'pozemky'],
+            ['type' => 'komerční'],
+            ['type' => 'ostatní'],
         ];
 
         DB::table('estate_types')->insert($types);
