@@ -140,6 +140,7 @@
               </div>
             </div>
             <div class="flex justify-start gap-2 mt-4">
+              @if (isAuthenticated) {
               <button
                 (click)="toggleFavorite(reality.uuid)"
                 class="btn-primary items-center gap-1 inline-flex"
@@ -157,6 +158,7 @@
                   }}
                 </span>
               </button>
+              }
               <div class="relative">
                 <button
                   class="flex btn-primary items-center gap-1 max-w-20"
@@ -181,6 +183,8 @@
                     class="w-full p-1 border border-gray-300 rounded mb-2" />
                 </div>
               </div>
+              @if (isAuthenticated) {
+
               <button
                 (click)="report(reality.uuid)"
                 class="btn-primary items-center gap-1 inline-flex">
@@ -190,6 +194,7 @@
                   size="lg"></fa-icon>
                 <span>Nahlásit</span>
               </button>
+              }
             </div>
           </div>
         </div>

@@ -34,6 +34,7 @@ export class SearchResultComponent {
   public searchResults$: BehaviorSubject<Array<Reality>> = new BehaviorSubject<Array<Reality>>([]);
   public maps = inject(MapsService);
   public query: string = '';
+  public searchTitle: string = '';
   public loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private search = inject(SearchService);
   private router = inject(Router);
@@ -56,7 +57,7 @@ export class SearchResultComponent {
       } else {
         transactionType = 'Prodej';
       }
-      this.query = `${transactionType} ${this.query}`;
+      this.searchTitle = `${transactionType} ${this.query}`;
       this.maps.reset();
       await this.handleSearch(this.pagination);
     });
@@ -81,6 +82,7 @@ export class SearchResultComponent {
       Object.values(REAL_ESTATE_TYPE).findIndex((item) => {
         return item === this.query;
       }) + 1;
+
     const { data, total, lastPage } = await this.search.search(
       index,
       this.filter,

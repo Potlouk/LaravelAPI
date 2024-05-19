@@ -31,6 +31,7 @@ import { SnackbarService } from '../shared/components/snackbar/services/snackbar
 import { ModalService } from '../shared/modal/modal.service';
 import { ConfirmComponent } from '../shared/components/confirm-delete/confirm.component';
 import { DelimiterPipe } from './pipes/delimiter.pipe';
+import { AuthService } from '../shared/auth/auth.service';
 
 export interface RealityIcons {
   user: IconDefinition;
@@ -73,6 +74,7 @@ export class RealityComponent {
   public reality$: Subject<Reality> = new Subject<Reality>();
   public onWatchedChange: boolean = false;
   private api = inject(ApiService);
+  private auth = inject(AuthService);
   private snackbar = inject(SnackbarService);
   private modal = inject(ModalService);
   private user = inject(UserService);
@@ -98,6 +100,9 @@ export class RealityComponent {
       const uuid = params['uuid'];
       this.loadReality(uuid);
     });
+  }
+  get isAuthenticated() {
+    return this.auth.isAuthenticated;
   }
 
   ngAfterViewChecked(): void {

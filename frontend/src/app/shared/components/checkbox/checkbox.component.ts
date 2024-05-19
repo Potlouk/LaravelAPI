@@ -24,7 +24,6 @@ export class CheckboxComponent {
     const target = event.target as HTMLInputElement;
 
     this.option.active = target.checked;
-    console.log(this.option.value);
     this.onChangeCheckBox.emit({
       active: target.checked,
       name: this.option.name,

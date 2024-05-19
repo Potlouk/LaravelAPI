@@ -52,11 +52,11 @@ export class SearchComponent {
   public searchCount: number = 0;
   ngOnInit(): void {}
 
-  onCheckboxChange(event: TransactionType) {
-    this.getSearchCount();
-  }
   onItemSelected(item: REAL_ESTATE_TYPE) {
     this.router.navigate(['/hledej', item]);
+  }
+  onInputChange() {
+    this.getSearchCount();
   }
   public async search() {
     const transaction_type = this.transactionType.find((item) => item.active) as TransactionType;

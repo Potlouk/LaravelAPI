@@ -124,7 +124,7 @@
               class="-mx-3 text-base p-2 block rounded-lg font-semibold leading-6 text-gray-900 cursor-pointer hover:bg-gray-100 transition duration-300 ease-in-out">
               Admin Panel
             </a>
-            } @for (route of routes; track $index) { @if(route.redirect){
+            } @for (route of routes; track $index) { @if (route.public || isAuthenticated) { @if(route.redirect){
             <span
               (click)="navigateToMyReality(); toggleMenu()"
               class="-mx-3 text-base p-2 block rounded-lg font-semibold leading-6 text-gray-900 cursor-pointer hover:bg-gray-100 transition duration-300 ease-in-out">
@@ -137,7 +137,7 @@
               class="-mx-3 text-base p-2 block rounded-lg font-semibold leading-6 text-gray-900 cursor-pointer hover:bg-gray-100 transition duration-300 ease-in-out">
               {{ route.name }}
             </a>
-            } }
+            } } }
           </div>
           <div class="py-6">
             @if (isAuthenticated) {

@@ -27,11 +27,12 @@
   <div class="grid grid-cols-3 md:grid-cols-4">
     @switch (filter.inputType) { @case ('checkbox') { @for (item of filter.filters; track $index) {
     <custom-checkbox
-      (onChangeCheckBox)="onCheckboxChange($event)"
+      (onChangeCheckBox)="onInputChange()"
       [option]="item"></custom-checkbox>
     } } @case ('range') { @for (item of filter.filters; track $index) {
     <input
       type="number"
+      (blur)="onInputChange()"
       placeholder="{{ item.name }}"
       [(ngModel)]="item.value"
       class="border border-gray-300 rounded-md p-2 m-2 focus:outline-none focus:ring focus:ring-red-500" />
@@ -39,6 +40,7 @@
     } } @case ('dropdown') {
     <select
       class="border border-gray-300 rounded-md bg-white p-2 m-2 focus:outline-none focus:ring focus:ring-red-500"
+      (ngModelChange)="onInputChange()"
       [(ngModel)]="filter.filters[0].value">
       <option
         *ngFor="let item of filter.filters[0].options"
@@ -46,8 +48,7 @@
         {{ item.name }}
       </option>
     </select>
-    } @case ('input') {
-
+    } @case ('input') { test
     <input
       type="text"
       placeholder="{{ filter.filters[0].name }}"
