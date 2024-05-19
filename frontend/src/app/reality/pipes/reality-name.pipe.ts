@@ -24,7 +24,7 @@ export class RealityNamePipe implements PipeTransform {
       case REAL_ESTATE_TYPE.KOMERCNI:
         return 'Komerční';
       case REAL_ESTATE_TYPE.POZEMKY:
-        return 'Pozemeku';
+        return 'Pozemku';
       case REAL_ESTATE_TYPE.OSTATNI:
         return 'Ostatní';
 

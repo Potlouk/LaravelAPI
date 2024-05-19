@@ -14,7 +14,7 @@ class EstateSubTypeSeeder extends Seeder
     public function run(): void
     {
         $types = [
-            ['type' => 'pokoj'], 
+            ['type' => 'pokoj'],
             ['type' => '1+kk'],
             ['type' => '1+1'],
             ['type' => '2+kk'],
@@ -35,6 +35,15 @@ class EstateSubTypeSeeder extends Seeder
             ['type' => 'zemědělská usedlost'],
             ['type' => 'památka/jiné'],
             ['type' => 'vícegenerační dům'],
+            ['type' => 'Bydlení'],
+            ['type' => 'komerční'],
+            ['type' => 'ostatní'],
+            ['type' => 'pole'],
+            ['type' => 'lesy'],
+            ['type' => 'rybníky'],
+            ['type' => 'sady/vinice'],
+            ['type' => 'zahrady'],
+            ['type' => 'ostatní'],
             ['type' => 'kanceláře'],
             ['type' => 'sklady'],
             ['type' => 'výroba'],
@@ -51,15 +60,6 @@ class EstateSubTypeSeeder extends Seeder
             ['type' => 'mobilheim'],
             ['type' => 'vinný sklep'],
             ['type' => 'půdní prostor'],
-            ['type' => 'ostatní'],
-            ['type' => 'Bydlení'],
-            ['type' => 'komerční'],
-            ['type' => 'ostatní'],
-            ['type' => 'pole'],
-            ['type' => 'lesy'],
-            ['type' => 'rybníky'],
-            ['type' => 'sady/vinice'],
-            ['type' => 'zahrady'],
             ['type' => 'ostatní'],
         ];
 

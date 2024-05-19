@@ -36,19 +36,30 @@ export const selectTypeArray = (type: REAL_ESTATE_TYPE): RealityCreateOptions =>
     case REAL_ESTATE_TYPE.POZEMKY:
       realityCreateSubType.options = REAL_ESTATE_POZEMKY_TYP_ARRAY.map((key, index) => ({
         name: key,
-        value: index + REAL_ESTATE_DOMY_TYP_ARRAY.length + 1,
+        value: index + REAL_ESTATE_DOMY_TYP_ARRAY.length + REAL_ESTATE_BYTY_TYP_ARRAY.length + 1,
       }));
       break;
     case REAL_ESTATE_TYPE.KOMERCNI:
       realityCreateSubType.options = REAL_ESTATE_KOMERCNI_TYP_ARRAY.map((key, index) => ({
         name: key,
-        value: index + REAL_ESTATE_POZEMKY_TYP_ARRAY.length + 1,
+        value:
+          index +
+          REAL_ESTATE_POZEMKY_TYP_ARRAY.length +
+          REAL_ESTATE_DOMY_TYP_ARRAY.length +
+          REAL_ESTATE_BYTY_TYP_ARRAY.length +
+          1,
       }));
       break;
     case REAL_ESTATE_TYPE.OSTATNI:
       realityCreateSubType.options = REAL_ESTATE_OSTATNI_TYP_ARRAY.map((key, index) => ({
         name: key,
-        value: index + REAL_ESTATE_KOMERCNI_TYP_ARRAY.length + 1,
+        value:
+          index +
+          REAL_ESTATE_KOMERCNI_TYP_ARRAY.length +
+          REAL_ESTATE_POZEMKY_TYP_ARRAY.length +
+          REAL_ESTATE_DOMY_TYP_ARRAY.length +
+          REAL_ESTATE_BYTY_TYP_ARRAY.length +
+          1,
       }));
       break;
     default:
