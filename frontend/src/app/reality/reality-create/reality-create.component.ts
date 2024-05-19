@@ -147,7 +147,6 @@ export class RealityCreateComponent {
         return true;
       }
     });
-    console.log(this.reality.dataForm(this.realityCreateOptionsSteps));
   }
   private reset(): void {
     this.realityCreateOptionsSteps.forEach((step) => {
